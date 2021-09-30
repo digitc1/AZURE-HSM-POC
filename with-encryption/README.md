@@ -12,6 +12,7 @@ $ New-AzResourceGroupDeployment -TemplateFile ./function-with-encryption.json -R
 
 ## Observations
 - When looking at the data encryption in the CosmosDB service in the portal, we see that data encryption is set to "customer-managed key" with a reference to the key used.
+- When looking at the encryption in the Azure storage service in the portal, we see that data encryption is set to "customer-managed keys" with a reference to the key used.
 - The exact same node js application can read and write data to CosmosDB. There is absolutely no change needed as the data is only encrypted at rest without any impact on "encryption in use" and "encryption in transit".
 
 ## Additional notes
@@ -27,4 +28,3 @@ In the other scripts, we can notice that CosmosDB template differs by a single "
 ## ManagedHSM
 Microsoft also propose a new service called managedHSM which provides a FIPS 140-2 Level 3 validated HSMs. Unfortunatelly, this service is not fully integrated yet with ARM templates (the only supported operation at this time is creation of the managed HSM, the creation of access policies and keys is not supported).
 However, while dealing with managedHSM in a different way (using Azure cli or Azure Shell) to create the keys, they can be referenced in the same way in templates using "keyVaultURI" property.
-
