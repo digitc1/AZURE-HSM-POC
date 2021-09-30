@@ -1,0 +1,45 @@
+{
+   "$schema":"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+   "contentVersion":"1.0.0.0",
+   "parameters":{
+      "managedHSMName":{
+         "type":"string",
+         "metadata":{
+            "description":"String specifying the name of the managed HSM."
+         }
+      },
+      "initialAdminObjectIds":{
+         "type":"array",
+         "metadata":{
+            "description":"Array specifying the objectIDs associated with a list of initial administrators."
+         }
+      }
+   },
+   "resources":[
+      {
+         "type":"Microsoft.KeyVault/managedHSMs",
+         "name":"[parameters('managedHSMName')]",
+         "location":"westeurope",
+         "apiVersion":"2021-04-01-preview",
+         "sku": {
+           "name": "Standard_B1",
+            "family": "B"
+         },
+         "properties":{
+            "EnableSoftDelete":true,
+            "SoftDeleteRetentionInDays":90,
+            "EnablePurgeProtection":false,
+            "TenantId":"[subscription().tenantId]",
+            "InitialAdminObjectIds":"[parameters('initialAdminObjectIds')]",
+            "PublicNetworkAccess": "Enabled",
+            "NetworkAcls": {
+              "Bypass": "None",
+              "DefaultAction": "Allow",
+              "IpRules": [],
+              "VirtualNetworkRules": []
+            }
+         }
+      }
+   ]
+}
+

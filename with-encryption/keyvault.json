@@ -1,0 +1,93 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vaultName": {
+                "type": "string"
+        }
+    },
+    "resources":
+    [
+        {
+            "name": "storageIdentity",
+            "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+            "apiVersion": "2018-11-30",
+            "location": "westeurope"
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[parameters('vaultName')]",
+            "location": "westeurope",
+            "dependsOn": [
+                "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'storageIdentity')]"
+            ],
+            "properties": {
+                "tenantId": "[subscription().tenantId]",
+                "sku": {
+                    "family": "A",
+                    "name": "Premium"
+                },
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "1101583b-c7a2-496f-b352-306597cf2bf8",
+                        "permissions": {
+                            "keys": [
+                                "get",
+                                "wrapKey",
+                                "unwrapKey"
+                            ]
+                        }
+                    },
+                    {
+                        "tenantId": "[subscription().tenantId]",
+                        "objectId": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'storageIdentity'), '2018-11-30', 'full').properties.principalId]",
+                        "permissions": {
+                            "keys": [
+                                "get",
+                                "wrapKey",
+                                "unwrapKey"
+                            ]
+                        }
+                    }
+                ],
+                "enabledForDeployment": true,
+                "enabledForDiskEncryption": true,
+                "enabledForTemplateDeployment": true,
+                "enableSoftDelete": true,
+                "softDeleteRetentionInDays": 90,
+                "enableRbacAuthorization": false,
+                "enablePurgeProtection": true
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/keys",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[concat(parameters('vaultName'), '/cosmosKey')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+            ],
+            "properties": {
+                "kty": "RSA-HSM",
+                "attributes": {
+                        "enabled": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/keys",
+            "apiVersion": "2021-04-01-preview",
+            "name": "[concat(parameters('vaultName'), '/storageKey')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', parameters('vaultName'))]"
+            ],
+            "properties": {
+                "kty": "RSA-HSM",
+                "attributes": {
+                        "enabled": true
+                }
+            }
+        }
+    ]
+}

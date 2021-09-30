@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cosmosDbName": {
+            "type": "string"
+        },
+        "vaultName": {
+                "type": "string"
+        }
+    },
+    "resources":
+    [
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts",
+            "name": "[parameters('cosmosDbName')]",
+            "apiVersion": "2021-04-15",
+            "kind": "MongoDB",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "locations": [
+                    {
+                        "locationName": "westeurope",
+                        "failoverPriority": 0,
+                        "isZoneRedundant": false
+                    }
+                ],
+                "defaultIdentity": "FirstPartyIdentity",
+                "databaseAccountOfferType": "Standard",
+                "keyVaultKeyUri": "[concat('https://', parameters('vaultName'), '.vault.azure.net/keys/cosmosKey')]"
+            }
+        }
+    ]
+}
