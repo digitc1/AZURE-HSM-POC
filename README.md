@@ -1,4 +1,4 @@
-# AZURE-KMS-POC - Proof of Concept on HSM and keyvault
+# AZURE-HMS-POC - Proof of Concept on HSM and keyvault
 
 The purpose of this exercise is to develop a quick implementation of a function reading data from a Azure storage queue in a encrypted CosmosDB with a Customer Managed Key (in Azure managed HSM)
 
